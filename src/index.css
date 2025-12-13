@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply transition-colors duration-300;
+  }
+  
+  body.light {
+    @apply bg-gradient-to-br from-purple-50 via-white to-green-50;
+  }
+  
+  body.dark {
+    @apply bg-gradient-to-br from-gray-900 via-slate-900 to-gray-800;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply backdrop-blur-lg border shadow-xl transition-colors duration-300;
+  }
+  
+  .light .glass {
+    @apply bg-white/80 border-white/20;
+  }
+  
+  .dark .glass {
+    @apply bg-gray-800/80 border-gray-700/20;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-multimedia-dark to-sistemas-dark bg-clip-text text-transparent;
+  }
+  
+  .text-primary {
+    @apply transition-colors duration-300;
+  }
+  
+  .light .text-primary {
+    @apply text-gray-800;
+  }
+  
+  .dark .text-primary {
+    @apply text-gray-100;
+  }
+  
+  .text-secondary {
+    @apply transition-colors duration-300;
+  }
+  
+  .light .text-secondary {
+    @apply text-gray-600;
+  }
+  
+  .dark .text-secondary {
+    @apply text-gray-300;
+  }
+}
