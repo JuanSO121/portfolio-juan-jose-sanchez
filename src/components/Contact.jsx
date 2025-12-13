@@ -19,14 +19,14 @@ const Contact = () => {
       icon: FaLinkedin,
       label: 'LinkedIn',
       value: 'Juan José Sánchez Ocampo',
-      link: 'https://www.linkedin.com/in/juan-jose-sanchez-ocampo/',
+      link: 'www.linkedin.com/in/juansanchez01',
       color: 'from-blue-200 to-blue-300',
     },
     {
       icon: FaGithub,
       label: 'GitHub',
       value: '@juanjosesanchezocampo',
-      link: 'https://github.com/juanjosesanchezocampo',
+      link: 'https://github.com/JuanSO121',
       color: 'from-gray-200 to-gray-300',
     },
     {

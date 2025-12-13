@@ -3,8 +3,8 @@ import { FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
 
 const Hero = () => {
   const socialLinks = [
-    { icon: FaGithub, href: 'https://github.com/juanjosesanchezocampo', label: 'GitHub' },
-    { icon: FaLinkedin, href: 'https://www.linkedin.com/in/juan-jose-sanchez-ocampo/', label: 'LinkedIn' },
+    { icon: FaGithub, href: 'https://github.com/JuanSO121', label: 'GitHub' },
+    { icon: FaLinkedin, href: 'https://www.linkedin.com/in/juansanchez01', label: 'LinkedIn' },
     { icon: FaEnvelope, href: 'mailto:juanjosesanchezocampo2@gmail.com', label: 'Email' },
   ];
 
@@ -27,7 +27,7 @@ const Hero = () => {
           </motion.h1>
           
           <motion.p
-            className="text-xl md:text-2xl text-secondary mb-6"
+            className="text-xl md:text-2xl text-secondary mb-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
@@ -99,21 +99,23 @@ const Hero = () => {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
-          className="relative"
+          className="relative flex justify-center items-center"
         >
           <motion.div
             animate={{ y: [0, -20, 0] }}
             transition={{ duration: 3, repeat: Infinity }}
             className="relative z-10"
           >
-            <div className="w-80 h-80 mx-auto rounded-full bg-gradient-to-br from-multimedia-light to-sistemas-light p-2">
-              <div className="w-full h-full rounded-full glass flex items-center justify-center text-6xl">
-                👨‍💻
-              </div>
+            <div className="w-80 h-96 mx-auto rounded-2xl overflow-hidden shadow-2xl">
+              <img 
+                src="/profile.png" 
+                alt="Juan José Sánchez Ocampo"
+                className="w-full h-full object-cover"
+              />
             </div>
           </motion.div>
           
-          <div className="absolute inset-0 bg-gradient-to-br from-multimedia-light to-sistemas-light rounded-full blur-3xl opacity-50"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-multimedia-light to-sistemas-light rounded-3xl blur-3xl opacity-30 scale-95"></div>
         </motion.div>
       </div>
     </section>
