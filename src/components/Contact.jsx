@@ -19,7 +19,7 @@ const Contact = () => {
       icon: FaLinkedin,
       label: 'LinkedIn',
       value: 'Juan José Sánchez Ocampo',
-      link: 'www.linkedin.com/in/juansanchez01',
+      link: 'https://www.linkedin.com/in/juansanchez01',
       color: 'from-blue-200 to-blue-300',
     },
     {

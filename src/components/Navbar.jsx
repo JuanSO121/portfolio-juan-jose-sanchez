@@ -60,11 +60,19 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="text-2xl font-bold gradient-text cursor-pointer"
+            className="flex items-center gap-2 cursor-pointer"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           >
-            JJSO
+            <img
+              src="/JS.svg"
+              alt="JJSO Logo"
+              className="w-8 h-8"
+            />
+            <span className="text-2xl font-bold gradient-text">
+              JJSO
+            </span>
           </motion.div>
+
 
           <div className="hidden md:flex items-center space-x-8">
             {menuItems.map((item, index) => (
