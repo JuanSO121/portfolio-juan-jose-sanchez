@@ -1,319 +1,348 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { useInView } from 'framer-motion';
-import { useRef, useState, useEffect } from 'react';
-import { FaGithub, FaExternalLinkAlt, FaChevronLeft, FaChevronRight, FaImage } from 'react-icons/fa';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { useRef, useState, useEffect, useCallback } from 'react';
+import { FaGithub, FaExternalLinkAlt, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
-// ─────────────────────────────────────────────
-// Importa TODAS las imágenes de todas las carpetas
-// Ajusta el glob si usas jpg/webp también
-// ─────────────────────────────────────────────
+/* ─── glob de imágenes ─────────────────────────────────────────── */
 const allImages = import.meta.glob(
   '/public/proyects/**/*.{png,jpg,jpeg,webp,gif,svg}',
   { eager: true }
 );
 
-// Agrupa las imágenes por nombre de carpeta
 function getProjectImages(folderName) {
   return Object.entries(allImages)
     .filter(([path]) => path.includes(`/proyects/${folderName}/`))
     .map(([, mod]) => mod.default);
 }
 
-// ─────────────────────────────────────────────
-// Mini carrusel de imágenes para cada proyecto
-// ─────────────────────────────────────────────
-const ImageCarousel = ({ images, emoji }) => {
-  const [imgIndex, setImgIndex] = useState(0);
-  const [direction, setDirection] = useState(1);
+/* ─── datos ─────────────────────────────────────────────────────── */
+const PROJECTS = [
+  {
+    title: 'COMPAS',
+    subtitle: 'Sistema de Asistencia AR',
+    description:
+      'Aplicación móvil accesible con Realidad Aumentada para navegación en interiores, orientada a personas con discapacidad visual. Implementa AR Foundation en Unity para posicionamiento 3D.',
+    emoji: '🧭',
+    folder: 'compas',
+    tags: ['Flutter', 'Unity', 'AR Foundation', 'Accesibilidad'],
+    github: '#',
+    demo: '#',
+    status: 'En desarrollo',
+    accent: '#6EE7B7',
+  },
+  {
+    title: 'Productivity',
+    subtitle: 'Plataforma IA Académica',
+    description:
+      'Aplicación móvil de productividad académica con módulos de IA para asistencia y generación de contenido. Arquitectura completa mobile conectada con servicios backend inteligentes.',
+    emoji: '📚',
+    folder: 'productivity',
+    tags: ['Mobile', 'IA', 'Flutter', 'API REST'],
+    github: '#',
+    demo: '#',
+    status: '2024',
+    accent: '#93C5FD',
+  },
+  {
+    title: 'Mappa',
+    subtitle: 'App Turismo Social',
+    description:
+      'Aplicación móvil de turismo social con mapas interactivos y geolocalización. Implementa consultas optimizadas en PostgreSQL y experiencia de usuario enfocada en descubrimiento.',
+    emoji: '🗺️',
+    folder: 'mappa',
+    tags: ['Ionic', 'Angular', 'PostgreSQL', 'Maps API'],
+    github: '#',
+    demo: '#',
+    status: 'Mayo 2025',
+    accent: '#FCA5A5',
+  },
+  {
+    title: 'Portafolio',
+    subtitle: 'Web Profesional',
+    description:
+      'Portafolio web moderno y responsivo desarrollado con React, Vite y Tailwind CSS. Incluye modo oscuro, animaciones fluidas con Framer Motion y diseño adaptativo.',
+    emoji: '💼',
+    folder: 'portafolio',
+    tags: ['React', 'Vite', 'Tailwind CSS', 'Framer Motion'],
+    github: 'https://github.com/juanjosesanchezocampo/portafolio',
+    demo: '#',
+    status: '2025',
+    accent: '#F9A8D4',
+  },
+];
 
-  const hasImages = images && images.length > 0;
+/* ─── ImageStage ─────────────────────────────────────────────────── */
+const ImageStage = ({ images, emoji, accent }) => {
+  const [idx, setIdx] = useState(0);
+  const [dir, setDir] = useState(1);
+  const hasImg = images.length > 0;
 
-  const next = (e) => {
-    e.stopPropagation();
-    setDirection(1);
-    setImgIndex((p) => (p + 1) % images.length);
-  };
-  const prev = (e) => {
-    e.stopPropagation();
-    setDirection(-1);
-    setImgIndex((p) => (p - 1 + images.length) % images.length);
-  };
+  const go = useCallback((next) => {
+    setDir(next > idx ? 1 : -1);
+    setIdx(next);
+  }, [idx]);
 
-  // Auto-avance cada 3 s si hay más de 1 imagen
+  useEffect(() => { setIdx(0); }, [images]);
+
   useEffect(() => {
-    if (!hasImages || images.length <= 1) return;
+    if (!hasImg || images.length <= 1) return;
     const t = setInterval(() => {
-      setDirection(1);
-      setImgIndex((p) => (p + 1) % images.length);
-    }, 3000);
+      setDir(1);
+      setIdx((p) => (p + 1) % images.length);
+    }, 3500);
     return () => clearInterval(t);
-  }, [hasImages, images]);
+  }, [hasImg, images.length]);
+
+  if (!hasImg) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center gap-4 select-none"
+        style={{ background: `radial-gradient(ellipse at 60% 40%, ${accent}22, transparent 70%)` }}>
+        <span className="text-8xl">{emoji}</span>
+        <span className="text-xs tracking-widest uppercase opacity-40 font-mono">Sin capturas</span>
+      </div>
+    );
+  }
 
   return (
-    <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gradient-to-br from-multimedia-light to-sistemas-light flex items-center justify-center min-h-[200px]">
-      {hasImages ? (
-        <>
-          <AnimatePresence mode="wait" custom={direction}>
-            <motion.img
-              key={imgIndex}
-              src={images[imgIndex]}
-              alt={`screenshot-${imgIndex}`}
-              custom={direction}
-              variants={{
-                enter: (d) => ({ x: d > 0 ? '60%' : '-60%', opacity: 0 }),
-                center: { x: 0, opacity: 1 },
-                exit: (d) => ({ x: d > 0 ? '-60%' : '60%', opacity: 0 }),
+    <div className="relative w-full h-full overflow-hidden bg-black flex flex-col">
+      {/* Imagen principal */}
+      <div className="relative flex-1 overflow-hidden">
+        <AnimatePresence mode="wait" custom={dir}>
+          <motion.div
+            key={idx}
+            custom={dir}
+            variants={{
+              enter: (d) => ({ x: d > 0 ? '100%' : '-100%', opacity: 0 }),
+              center: { x: 0, opacity: 1 },
+              exit: (d) => ({ x: d > 0 ? '-25%' : '25%', opacity: 0, scale: 0.96 }),
+            }}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+            className="absolute inset-0 flex items-center justify-center p-3"
+          >
+            <img
+              src={images[idx]}
+              alt={`screenshot-${idx}`}
+              style={{
+                maxWidth: '100%',
+                maxHeight: '100%',
+                width: 'auto',
+                height: 'auto',
+                objectFit: 'contain',
+                borderRadius: 8,
+                display: 'block',
               }}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.35, ease: 'easeInOut' }}
-              className="absolute inset-0 w-full h-full object-contain"
             />
-          </AnimatePresence>
+          </motion.div>
+        </AnimatePresence>
 
-          {/* Flechas del mini carrusel */}
-          {images.length > 1 && (
-            <>
-              <button
-                onClick={prev}
-                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 hover:bg-black/60 text-white rounded-full flex items-center justify-center z-20 transition-all"
-              >
-                <FaChevronLeft size={12} />
-              </button>
-              <button
-                onClick={next}
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 hover:bg-black/60 text-white rounded-full flex items-center justify-center z-20 transition-all"
-              >
-                <FaChevronRight size={12} />
-              </button>
+        {/* Flechas */}
+        {images.length > 1 && (
+          <>
+            <button
+              onClick={(e) => { e.stopPropagation(); go((idx - 1 + images.length) % images.length); }}
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center z-20 transition-all backdrop-blur-md"
+              style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)' }}>
+              <FaChevronLeft size={13} color="white" />
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); go((idx + 1) % images.length); }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center z-20 transition-all backdrop-blur-md"
+              style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)' }}>
+              <FaChevronRight size={13} color="white" />
+            </button>
+          </>
+        )}
 
-              {/* Dots */}
-              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-20">
-                {images.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={(e) => { e.stopPropagation(); setImgIndex(i); }}
-                    className={`rounded-full transition-all ${
-                      i === imgIndex ? 'w-5 h-2 bg-white' : 'w-2 h-2 bg-white/50'
-                    }`}
-                  />
-                ))}
-              </div>
-            </>
-          )}
-
-          {/* Contador */}
-          {images.length > 1 && (
-            <div className="absolute top-3 right-3 bg-black/50 text-white text-xs px-2 py-0.5 rounded-full z-20">
-              {imgIndex + 1}/{images.length}
-            </div>
-          )}
-        </>
-      ) : (
-        // Fallback con emoji si no hay imágenes
-        <div className="flex flex-col items-center gap-3 text-gray-400">
-          <div className="text-9xl">{emoji}</div>
-          <div className="flex items-center gap-1 text-xs bg-black/10 px-3 py-1 rounded-full">
-            <FaImage size={10} />
-            <span>Sin imágenes aún</span>
+        {/* Contador */}
+        {images.length > 1 && (
+          <div className="absolute top-3 right-3 z-20 text-xs font-mono px-2.5 py-1 rounded-full backdrop-blur-md"
+            style={{ background: 'rgba(0,0,0,0.55)', color: 'rgba(255,255,255,0.85)' }}>
+            {idx + 1} / {images.length}
           </div>
+        )}
+      </div>
+
+      {/* Tira de thumbnails */}
+      {images.length > 1 && (
+        <div className="flex gap-1.5 p-2 bg-black/70 backdrop-blur-sm overflow-x-auto"
+          style={{ scrollbarWidth: 'none' }}>
+          {images.map((src, i) => (
+            <button
+              key={i}
+              onClick={(e) => { e.stopPropagation(); go(i); }}
+              className="flex-shrink-0 rounded overflow-hidden transition-all duration-300"
+              style={{
+                width: 52,
+                height: 38,
+                outline: i === idx ? `2px solid ${accent}` : '2px solid transparent',
+                outlineOffset: 1,
+                opacity: i === idx ? 1 : 0.4,
+              }}>
+              <img src={src} alt="" className="w-full h-full object-cover" />
+            </button>
+          ))}
         </div>
       )}
     </div>
   );
 };
 
-// ─────────────────────────────────────────────
-// Componente principal
-// ─────────────────────────────────────────────
+/* ─── Projects principal ─────────────────────────────────────────── */
 const Projects = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [projIdx, setProjIdx] = useState(0);
+  const [projDir, setProjDir] = useState(1);
 
-  // 🔑 "folder" debe coincidir EXACTAMENTE con el nombre de la carpeta
-  //     dentro de public/proyects/
-  const projects = [
-    {
-      title: 'COMPAS - Sistema de Asistencia AR',
-      description:
-        'Aplicación móvil accesible con Realidad Aumentada para navegación en interiores, orientada a personas con discapacidad visual. Implementa AR Foundation en Unity para posicionamiento 3D y asistente virtual integrado.',
-      emoji: '🧭',
-      folder: 'compas',          // → public/proyects/compas/
-      tags: ['Flutter', 'Unity', 'AR Foundation', 'Accesibilidad'],
-      github: '#',
-      demo: '#',
-      status: 'En desarrollo',
-    },
-    {
-      title: 'Productivity - Plataforma IA Académica',
-      description:
-        'Aplicación móvil de productividad académica con módulos de IA para asistencia y generación de contenido. Arquitectura completa mobile conectada con servicios backend inteligentes.',
-      emoji: '📚',
-      folder: 'productivity',    // → public/proyects/productivity/
-      tags: ['Mobile', 'IA', 'Flutter', 'Backend Integration', 'API REST'],
-      github: '#',
-      demo: '#',
-      status: '2024',
-    },
-    {
-      title: 'Mappa - App Turismo Social',
-      description:
-        'Aplicación móvil de turismo social con mapas interactivos y geolocalización. Implementa consultas optimizadas en PostgreSQL y experiencia de usuario enfocada en descubrimiento de lugares.',
-      emoji: '🗺️',
-      folder: 'mappa',           // → public/proyects/mappa/
-      tags: ['Ionic', 'Angular', 'PostgreSQL', 'Maps API', 'Geolocation'],
-      github: '#',
-      demo: '#',
-      status: 'Mayo 2025',
-    },
-    {
-      title: 'Portafolio Profesional',
-      description:
-        'Portafolio web moderno y responsivo desarrollado con React, Vite y Tailwind CSS. Incluye modo oscuro, animaciones fluidas con Framer Motion y diseño adaptativo para diferentes dispositivos.',
-      emoji: '💼',
-      folder: 'portafolio',      // → public/proyects/portafolio/
-      tags: ['React', 'Vite', 'Tailwind CSS', 'Framer Motion', 'Responsive'],
-      github: 'https://github.com/juanjosesanchezocampo/portafolio',
-      demo: '#',
-      status: '2025',
-    },
-  ];
+  const projects = PROJECTS.map((p) => ({ ...p, images: getProjectImages(p.folder) }));
+  const cur = projects[projIdx];
 
-  // Precarga imágenes de cada proyecto
-  const projectsWithImages = projects.map((p) => ({
-    ...p,
-    images: getProjectImages(p.folder),
-  }));
-
-  const next = () => setCurrentIndex((p) => (p + 1) % projects.length);
-  const prev = () => setCurrentIndex((p) => (p - 1 + projects.length) % projects.length);
-
-  const current = projectsWithImages[currentIndex];
+  const goProj = (next) => {
+    setProjDir(next > projIdx ? 1 : -1);
+    setProjIdx(next);
+  };
 
   return (
     <section id="projects" className="py-20 px-4">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <motion.div
           ref={ref}
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.7 }}
         >
           <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-primary">
             Proyectos <span className="gradient-text">Destacados</span>
           </h2>
-
           <div className="w-20 h-1 bg-gradient-to-r from-multimedia-dark to-sistemas-dark mx-auto mb-12 rounded-full" />
 
           <div className="relative">
-            {/* Carrusel principal de proyectos */}
-            <div className="overflow-hidden">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentIndex}
-                  initial={{ opacity: 0, x: 60 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -60 }}
-                  transition={{ duration: 0.4, ease: 'easeInOut' }}
-                  className="px-4"
+            <AnimatePresence mode="wait" custom={projDir}>
+              <motion.div
+                key={projIdx}
+                custom={projDir}
+                variants={{
+                  enter: (d) => ({ x: d > 0 ? 80 : -80, opacity: 0 }),
+                  center: { x: 0, opacity: 1 },
+                  exit: (d) => ({ x: d > 0 ? -80 : 80, opacity: 0 }),
+                }}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.45, ease: [0.32, 0.72, 0, 1] }}
+              >
+                <div
+                  className="glass rounded-3xl overflow-hidden"
+                  style={{ boxShadow: `0 0 60px ${cur.accent}18` }}
                 >
-                  <div className="glass rounded-3xl overflow-hidden max-w-4xl mx-auto">
-                    <div className="grid md:grid-cols-2 gap-6 p-8">
-                      {/* Panel de imágenes */}
-                      <div className="relative min-h-[260px]">
-                        <ImageCarousel images={current.images} emoji={current.emoji} />
-                        <div className="absolute top-4 right-4 px-3 py-1 bg-white/90 rounded-full text-xs font-semibold text-gray-700 z-30">
-                          {current.status}
+                  <div className="grid md:grid-cols-[1.1fr_1fr]">
+
+                    {/* ── Visor de imágenes ── */}
+                    <div className="h-[320px] md:h-[460px] bg-black">
+                      <ImageStage images={cur.images} emoji={cur.emoji} accent={cur.accent} />
+                    </div>
+
+                    {/* ── Info ── */}
+                    <div className="flex flex-col justify-between p-8 md:p-10 relative overflow-hidden">
+                      <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full blur-3xl pointer-events-none"
+                        style={{ background: `${cur.accent}20` }} />
+
+                      <div>
+                        <span
+                          className="inline-block text-xs font-semibold px-3 py-1 rounded-full mb-5 tracking-wider"
+                          style={{ background: `${cur.accent}22`, color: cur.accent }}>
+                          {cur.status}
+                        </span>
+
+                        <h3 className="text-3xl md:text-4xl font-black mb-1 gradient-text leading-tight">
+                          {cur.title}
+                        </h3>
+                        <p className="text-secondary font-medium mb-5 opacity-60">{cur.subtitle}</p>
+
+                        <p className="text-secondary leading-relaxed text-sm mb-7">
+                          {cur.description}
+                        </p>
+
+                        <div className="flex flex-wrap gap-2 mb-8">
+                          {cur.tags.map((tag, i) => (
+                            <motion.span
+                              key={tag}
+                              initial={{ opacity: 0, y: 8 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: i * 0.05 }}
+                              className="px-3 py-1 rounded-full text-xs font-medium"
+                              style={{
+                                background: `${cur.accent}15`,
+                                border: `1px solid ${cur.accent}40`,
+                                color: cur.accent,
+                              }}>
+                              {tag}
+                            </motion.span>
+                          ))}
                         </div>
                       </div>
 
-                      {/* Info del proyecto */}
-                      <div className="flex flex-col justify-center">
-                        <h3 className="text-2xl md:text-3xl font-bold mb-4 gradient-text">
-                          {current.title}
-                        </h3>
-
-                        <p className="text-secondary mb-6 leading-relaxed text-sm md:text-base">
-                          {current.description}
-                        </p>
-
-                        <div className="flex flex-wrap gap-2 mb-6">
-                          {current.tags.map((tag, i) => (
-                            <span
-                              key={i}
-                              className="px-3 py-1 bg-gradient-to-r from-multimedia-light to-sistemas-light rounded-full text-xs font-medium text-gray-700"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-
-                        <div className="flex gap-4">
-                          {current.github !== '#' && (
-                            <motion.a
-                              href={current.github}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              className="flex items-center gap-2 px-6 py-3 glass rounded-full font-semibold text-secondary hover:text-multimedia-dark transition-colors"
-                            >
-                              <FaGithub /> GitHub
-                            </motion.a>
-                          )}
-
+                      <div className="flex gap-3 flex-wrap">
+                        {cur.github !== '#' && (
                           <motion.a
-                            href={current.demo}
+                            href={cur.github}
                             target="_blank"
                             rel="noopener noreferrer"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-multimedia-dark to-sistemas-dark text-white rounded-full font-semibold shadow-lg"
-                          >
-                            <FaExternalLinkAlt />
-                            {current.github === '#' ? 'Próximamente' : 'Demo'}
+                            whileHover={{ scale: 1.04 }}
+                            whileTap={{ scale: 0.96 }}
+                            className="flex items-center gap-2 px-5 py-2.5 glass rounded-full text-sm font-semibold text-secondary hover:text-primary transition-colors">
+                            <FaGithub /> GitHub
                           </motion.a>
-                        </div>
+                        )}
+                        <motion.a
+                          href={cur.demo}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          whileHover={{ scale: 1.04 }}
+                          whileTap={{ scale: 0.96 }}
+                          className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold text-white shadow-lg"
+                          style={{ background: `linear-gradient(135deg, ${cur.accent}bb, ${cur.accent})` }}>
+                          <FaExternalLinkAlt />
+                          {cur.github === '#' ? 'Próximamente' : 'Ver Demo'}
+                        </motion.a>
                       </div>
                     </div>
                   </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
 
-            {/* Flechas del carrusel de proyectos */}
+            {/* Flechas de proyecto */}
             <button
-              onClick={prev}
-              className="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 glass rounded-full flex items-center justify-center text-secondary hover:text-multimedia-dark transition-colors z-10"
-            >
-              <FaChevronLeft size={24} />
+              onClick={() => goProj((projIdx - 1 + projects.length) % projects.length)}
+              className="absolute -left-5 top-1/2 -translate-y-1/2 w-10 h-10 glass rounded-full flex items-center justify-center text-secondary hover:text-primary transition-colors z-10 shadow-lg">
+              <FaChevronLeft size={18} />
             </button>
-
             <button
-              onClick={next}
-              className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 glass rounded-full flex items-center justify-center text-secondary hover:text-multimedia-dark transition-colors z-10"
-            >
-              <FaChevronRight size={24} />
+              onClick={() => goProj((projIdx + 1) % projects.length)}
+              className="absolute -right-5 top-1/2 -translate-y-1/2 w-10 h-10 glass rounded-full flex items-center justify-center text-secondary hover:text-primary transition-colors z-10 shadow-lg">
+              <FaChevronRight size={18} />
             </button>
-
-            {/* Dots de proyectos */}
-            <div className="flex justify-center gap-2 mt-8">
-              {projects.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentIndex(index)}
-                  className={`h-3 rounded-full transition-all ${
-                    index === currentIndex
-                      ? 'bg-gradient-to-r from-multimedia-dark to-sistemas-dark w-8'
-                      : 'bg-gray-300 dark:bg-gray-600 w-3'
-                  }`}
-                  aria-label={`Ir al proyecto ${index + 1}`}
-                />
-              ))}
-            </div>
           </div>
+
+          {/* Dots de proyecto */}
+          <div className="flex justify-center gap-2 mt-8">
+            {projects.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => goProj(i)}
+                className="h-2.5 rounded-full transition-all duration-300"
+                style={{
+                  width: i === projIdx ? 28 : 10,
+                  background: i === projIdx ? cur.accent : '#d1d5db',
+                }}
+                aria-label={`Proyecto ${i + 1}`}
+              />
+            ))}
+          </div>
+
         </motion.div>
       </div>
     </section>

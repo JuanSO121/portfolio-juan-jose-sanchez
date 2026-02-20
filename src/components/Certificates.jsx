@@ -22,7 +22,7 @@ const Certificates = () => {
       title: 'EF SET English Certificate',
       issuer: 'EF SET',
       date: '2025',
-      level: 'B2 Upper Intermediate',
+      level: 'B1 Intermediate',
       icon: FaGlobe,
       link: 'https://cert.efset.org/en/CQ1ejY',
       image: '/certificates/english-cert.jpg',
@@ -197,7 +197,7 @@ const Certificates = () => {
               </div>
               <div className="px-6 py-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg flex items-center gap-2">
                 <FaGlobe className="text-blue-500 text-xl" />
-                <span className="font-bold text-green-600">B2</span>
+                <span className="font-bold text-green-600">B1</span>
                 <span className="text-gray-600">Inglés</span>
               </div>
             </div>
