@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { FaJava, FaAngular, FaReact, FaNodeJs, FaDatabase, FaGitAlt, FaPython, FaDocker, FaLinux } from 'react-icons/fa';
-import { SiSpringboot, SiMongodb, SiPostgresql, SiTypescript, SiJavascript, SiFlutter, SiDart, SiMysql, SiUnity } from 'react-icons/si';
+import { SiSpringboot, SiMongodb, SiPostgresql, SiTypescript, SiJavascript, SiFlutter, SiMysql, SiUnity, SiIonic } from 'react-icons/si';
 
 const Skills = () => {
   const ref = useRef(null);
@@ -16,8 +16,7 @@ const Skills = () => {
         { name: 'Java', icon: FaJava, level: 85 },
         { name: 'JavaScript', icon: SiJavascript, level: 82 },
         { name: 'TypeScript', icon: SiTypescript, level: 80 },
-        { name: 'Python', icon: FaPython, level: 75 },
-        { name: 'Dart', icon: SiDart, level: 78 },
+        { name: 'Python', icon: FaPython, level: 75 }
       ],
     },
     {
@@ -43,7 +42,8 @@ const Skills = () => {
       title: 'Mobile & XR',
       color: 'from-pink-200 to-pink-300',
       skills: [
-        { name: 'Flutter', icon: SiFlutter, level: 80 },
+        { name: 'Flutter', icon: SiFlutter, level: 76 },
+        { name: 'Ionic', icon: SiIonic, level: 70 },
         { name: 'Unity AR', icon: SiUnity, level: 75 },
       ],
     },

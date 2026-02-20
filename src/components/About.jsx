@@ -67,7 +67,7 @@ const About = () => {
               
               <div className="text-center p-6 bg-gradient-to-br from-purple-100 to-green-100 rounded-2xl">
                 <div className="text-4xl font-bold gradient-text mb-2">∞</div>
-                <div className="text-primary font-medium">Aprendizaje</div>
+                <div className="text-primary font-medium">Aprendizaje Continuo</div>
               </div>
             </motion.div>
           </div>
