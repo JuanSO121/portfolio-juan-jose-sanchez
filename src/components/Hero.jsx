@@ -4,7 +4,7 @@ import AvatarScene from './ui/AvatarScene';
 import HeroBackdrop from './ui/HeroBackdrop';
 import RevealText from './ui/RevealText';
 
-const DATOS = ['Cali, Colombia', 'Disponible inmediatamente', 'Presencial, híbrido o remoto'];
+const DATOS = ['Cali, Colombia', 'Abierto a oportunidades', 'Presencial, híbrido o remoto'];
 const STACK = ['React', 'TypeScript', 'Java', 'Python'];
 
 const Hero = () => {
