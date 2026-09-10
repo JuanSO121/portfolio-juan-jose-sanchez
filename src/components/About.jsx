@@ -1,80 +1,100 @@
-import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { FaExternalLinkAlt } from 'react-icons/fa';
+import Section, { Reveal } from './ui/Section';
 
-const About = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
+const CREDENCIALES = [
+  {
+    titulo: 'Beca por Excelencia Académica',
+    emisor: 'Universidad de San Buenaventura Cali',
+    año: '2024',
+    link: null,
+  },
+  {
+    titulo: 'Full Stack Empresarial con Spring Boot y Angular',
+    emisor: 'Dev Senior',
+    año: '2025',
+    link: 'https://profiles.badgeclaimed.com/user-9457/badges/urn:uuid:3b5748dc-8164-4137-863d-62f41ef5974b.html',
+  },
+  {
+    titulo: 'Inglés B2',
+    emisor: 'EF SET',
+    año: '2025',
+    link: 'https://cert.efset.org/en/CQ1ejY',
+  },
+  {
+    titulo: 'Business Intelligence y Power BI',
+    emisor: 'BDG Academy',
+    año: '2024',
+    link: 'https://certificados.bdginstitute.edu.co/',
+  },
+];
 
-  return (
-    <section id="about" className="py-20 px-4">
-      <div className="max-w-6xl mx-auto">
-        <motion.div
-          ref={ref}
-          initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-        >
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-primary">
-            Sobre <span className="gradient-text">Mí</span>
-          </h2>
-          
-          <div className="w-20 h-1 bg-gradient-to-r from-multimedia-dark to-sistemas-dark mx-auto mb-12 rounded-full"></div>
+const About = () => (
+  <Section id="about" title="Perfil" band>
+    <div className="grid gap-12 md:grid-cols-[1fr_auto] md:gap-16">
+      <Reveal className="max-w-prose space-y-5 text-lg leading-relaxed text-muted">
+        <p>
+          Estudié dos carreras en paralelo, Ingeniería de Sistemas e Ingeniería Multimedia, porque
+          ninguna de las dos por separado explicaba lo que quería hacer.
+        </p>
+        <p>
+          Eso se nota en cómo trabajo: discuto el índice de una consulta con el mismo interés con el
+          que discuto si un botón se entiende. Busco un equipo donde me revisen el código y me
+          exijan más de lo que me exijo yo.
+        </p>
+      </Reveal>
 
-          <div className="glass rounded-3xl p-8 md:p-12">
-            <motion.p
-              className="text-lg text-secondary leading-relaxed mb-6"
-              initial={{ opacity: 0 }}
-              animate={isInView ? { opacity: 1 } : {}}
-              transition={{ delay: 0.2 }}
-            >
-              Estudiante de <span className="font-semibold text-sistemas-dark">Ingeniería de Sistemas</span> con doble programa en <span className="font-semibold text-multimedia-dark">Ingeniería Multimedia</span> en la Universidad San Buenaventura Cali, orientado a crear soluciones web y móviles claras, funcionales y bien diseñadas.
-            </motion.p>
-
-            <motion.p
-              className="text-lg text-secondary leading-relaxed mb-6"
-              initial={{ opacity: 0 }}
-              animate={isInView ? { opacity: 1 } : {}}
-              transition={{ delay: 0.4 }}
-            >
-              Cuento con experiencia académica en el desarrollo de aplicaciones web y móviles utilizando <span className="font-semibold">Java, Spring Boot, Angular y Flutter</span>, apoyándome en bases de datos <span className="font-semibold">SQL y NoSQL</span>.
-            </motion.p>
-
-            <motion.p
-              className="text-lg text-secondary leading-relaxed"
-              initial={{ opacity: 0 }}
-              animate={isInView ? { opacity: 1 } : {}}
-              transition={{ delay: 0.6 }}
-            >
-              Integro principios de ingeniería de software con criterios de interacción y experiencia de usuario para construir productos simples, útiles y centrados en las personas. Participo activamente en proyectos académicos y trabajo colaborativo, explorando tecnologías como IA y AR cuando el contexto lo requiere.
-            </motion.p>
-
-            <motion.div
-              className="grid md:grid-cols-3 gap-6 mt-12"
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.8 }}
-            >
-              <div className="text-center p-6 bg-gradient-to-br from-multimedia-light to-multimedia-DEFAULT rounded-2xl">
-                <div className="text-4xl font-bold gradient-text mb-2">8°</div>
-                <div className="text-primary font-medium">Semestre</div>
+      <Reveal delay={0.08}>
+        <dl className="space-y-7 text-sm md:w-56">
+          <div>
+            <dt className="mb-3 font-semibold text-ink">Formación</dt>
+            <dd className="space-y-3">
+              <div className="border-l-2 border-sistemas pl-3">
+                <p className="font-medium text-ink">Ingeniería de Sistemas</p>
+                <p className="text-faint">2022 — 2026 · pendiente de grado</p>
               </div>
-              
-              <div className="text-center p-6 bg-gradient-to-br from-sistemas-light to-sistemas-DEFAULT rounded-2xl">
-                <div className="text-4xl font-bold gradient-text mb-2">2</div>
-                <div className="text-primary font-medium">Carreras</div>
+              <div className="border-l-2 border-multimedia pl-3">
+                <p className="font-medium text-ink">Ingeniería Multimedia</p>
+                <p className="text-faint">2021 — 2026 · pendiente de grado</p>
               </div>
-              
-              <div className="text-center p-6 bg-gradient-to-br from-purple-100 to-green-100 rounded-2xl">
-                <div className="text-4xl font-bold gradient-text mb-2">∞</div>
-                <div className="text-primary font-medium">Aprendizaje Continuo</div>
-              </div>
-            </motion.div>
+              <p className="pt-1 text-muted">Universidad de San Buenaventura Cali</p>
+            </dd>
           </div>
-        </motion.div>
+
+          <div>
+            <dt className="mb-1.5 font-semibold text-ink">Idiomas</dt>
+            <dd className="text-muted">Español nativo · Inglés B2</dd>
+          </div>
+        </dl>
+      </Reveal>
+    </div>
+
+    <Reveal delay={0.12}>
+      <div className="mt-14">
+        <h3 className="mb-4 border-b border-line pb-2.5 text-sm font-semibold text-ink">
+          Certificaciones
+        </h3>
+        <ul className="divide-y divide-line">
+          {CREDENCIALES.map((c) => (
+            <li key={c.titulo} className="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-3">
+              <span className="font-medium text-ink">{c.titulo}</span>
+              <span className="text-sm text-muted">{c.emisor}</span>
+              <span className="text-sm text-faint">{c.año}</span>
+              {c.link && (
+                <a
+                  href={c.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ml-auto inline-flex items-center gap-1.5 text-sm text-multimedia hover:underline"
+                >
+                  Verificar <FaExternalLinkAlt size={10} />
+                </a>
+              )}
+            </li>
+          ))}
+        </ul>
       </div>
-    </section>
-  );
-};
+    </Reveal>
+  </Section>
+);
 
 export default About;

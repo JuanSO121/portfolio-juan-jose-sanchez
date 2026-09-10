@@ -1,122 +1,149 @@
-import { motion } from 'framer-motion';
-import { FaGithub, FaLinkedin, FaEnvelope } from 'react-icons/fa';
+import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion';
+import { FaArrowRight, FaGithub, FaLinkedin } from 'react-icons/fa';
+import AvatarScene from './ui/AvatarScene';
+import HeroBackdrop from './ui/HeroBackdrop';
+import RevealText from './ui/RevealText';
+
+const DATOS = ['Cali, Colombia', 'Disponible inmediatamente', 'Presencial, híbrido o remoto'];
 
 const Hero = () => {
-  const socialLinks = [
-    { icon: FaGithub, href: 'https://github.com/JuanSO121', label: 'GitHub' },
-    { icon: FaLinkedin, href: 'https://www.linkedin.com/in/juansanchez01', label: 'LinkedIn' },
-    { icon: FaEnvelope, href: 'mailto:juanjosesanchezocampo2@gmail.com', label: 'Email' },
-  ];
+  const reduce = useReducedMotion();
+
+  // Posición del puntero, normalizada a -0.5..0.5 sobre la sección.
+  const px = useMotionValue(0.5);
+  const py = useMotionValue(0.5);
+  const sx = useSpring(px, { stiffness: 140, damping: 22 });
+  const sy = useSpring(py, { stiffness: 140, damping: 22 });
+
+  const rotateY = useTransform(sx, [0, 1], [7, -7]);
+  const rotateX = useTransform(sy, [0, 1], [-7, 7]);
+  const glowX = useTransform(sx, (v) => `${v * 100}%`);
+  const glowY = useTransform(sy, (v) => `${v * 100}%`);
+
+  const onPointerMove = (e) => {
+    if (reduce) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    px.set((e.clientX - r.left) / r.width);
+    py.set((e.clientY - r.top) / r.height);
+  };
+
+  const container = { hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.5 } } };
+  const item = {
+    hidden: reduce ? {} : { opacity: 0, y: 14 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
+  };
 
   return (
-    <section id="home" className="min-h-screen flex items-center justify-center pt-16 px-4">
-      <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+    <section
+      onPointerMove={onPointerMove}
+      className="relative flex min-h-[100svh] items-center overflow-hidden px-5 pb-[clamp(3rem,7vh,5rem)] pt-[calc(4rem+clamp(2rem,5vh,4rem))] sm:px-8"
+    >
+      <HeroBackdrop />
+
+      {/* Foco que sigue al puntero. Solo aquí: es el saludo del sitio. */}
+      {!reduce && (
         <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <motion.h1
-            className="text-5xl md:text-7xl font-bold mb-4 text-primary"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            Hola, soy{' '}
-            <span className="gradient-text">Juan José Sánchez</span>
-          </motion.h1>
-          
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: `radial-gradient(420px circle at var(--gx) var(--gy), rgb(var(--multimedia) / 0.09), transparent 65%)`,
+            '--gx': glowX,
+            '--gy': glowY,
+          }}
+        />
+      )}
+
+      <div className="relative mx-auto grid w-full max-w-6xl items-center gap-10 md:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] md:gap-12">
+        <motion.div variants={container} initial="hidden" animate="show">
+          <RevealText
+            text="Juan José Sánchez"
+            delay={0.15}
+            className="text-display-lg font-extrabold text-ink"
+          />
+
           <motion.p
-            className="text-xl md:text-2xl text-secondary mb-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
+            variants={item}
+            className="mt-5 max-w-prose text-xl leading-relaxed text-muted sm:text-2xl"
           >
-            Desarrollador Full Stack | Ingeniero de Sistemas & Multimedia
-          </motion.p>
-          
-          <motion.p
-            className="text-lg text-secondary mb-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            Universidad San Buenaventura Cali
+            Desarrollador full stack con doble formación en Ingeniería de Sistemas e Ingeniería
+            Multimedia. Construyo aplicaciones web y móviles con React, TypeScript, Java y Python,
+            centradas en la experiencia de quien las usa.
           </motion.p>
 
-          <motion.div
-            className="flex flex-wrap gap-4 mb-8"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
+          <motion.p variants={item} className="mt-4 max-w-prose text-lg text-muted">
+            Busco mi primer puesto a tiempo completo en un equipo de producto.
+          </motion.p>
+
+          <motion.ul
+            variants={item}
+            className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-faint"
           >
+            {DATOS.map((d, i) => (
+              <li key={d} className="flex items-center gap-3">
+                {i > 0 && <span aria-hidden="true">·</span>}
+                {d}
+              </li>
+            ))}
+          </motion.ul>
+
+          <motion.div variants={item} className="mt-9 flex flex-wrap items-center gap-3">
             <motion.a
-              href="#contact"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-8 py-3 bg-gradient-to-r from-multimedia-dark to-sistemas-dark text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all"
+              href="#projects"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className="btn-primary group"
             >
-              Contáctame
+              Ver proyectos
+              <FaArrowRight
+                size={12}
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              />
             </motion.a>
-            
             <motion.a
               href="/Juan_Jose_Sanchez_CV.pdf"
               download
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-8 py-3 glass rounded-full font-semibold text-secondary hover:text-multimedia-dark transition-all"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className="btn-ghost"
             >
-              Descargar CV
+              Descargar hoja de vida
             </motion.a>
-          </motion.div>
-
-          <motion.div
-            className="flex gap-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-          >
-            {socialLinks.map((social, index) => (
-              <motion.a
-                key={social.label}
-                href={social.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ scale: 1.2, rotate: 5 }}
-                whileTap={{ scale: 0.9 }}
-                className="w-12 h-12 glass rounded-full flex items-center justify-center text-secondary hover:text-multimedia-dark transition-colors"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 + index * 0.1 }}
-              >
-                <social.icon size={24} />
-              </motion.a>
-            ))}
+            <div className="flex gap-2">
+              {[
+                { href: 'https://github.com/JuanSO121', label: 'GitHub', Icon: FaGithub },
+                {
+                  href: 'https://www.linkedin.com/in/jjsanchezo',
+                  label: 'LinkedIn',
+                  Icon: FaLinkedin,
+                },
+              ].map(({ href, label, Icon }) => (
+                <motion.a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  whileHover={{ y: -3 }}
+                  whileTap={{ scale: 0.94 }}
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-line text-muted transition-colors hover:border-multimedia hover:text-multimedia"
+                >
+                  <Icon size={17} />
+                </motion.a>
+              ))}
+            </div>
           </motion.div>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
+          initial={reduce ? false : { opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
-          className="relative flex justify-center items-center"
+          transition={{ duration: 0.6, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          style={reduce ? undefined : { rotateX, rotateY, transformPerspective: 1100 }}
+          className="order-first md:order-none"
         >
-          <motion.div
-            animate={{ y: [0, -20, 0] }}
-            transition={{ duration: 3, repeat: Infinity }}
-            className="relative z-10"
-          >
-            <div className="w-80 h-96 mx-auto rounded-2xl overflow-hidden shadow-2xl">
-              <img 
-                src="/profile.png" 
-                alt="Juan José Sánchez Ocampo"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </motion.div>
-          
-          <div className="absolute inset-0 bg-gradient-to-br from-multimedia-light to-sistemas-light rounded-3xl blur-3xl opacity-30 scale-95"></div>
+          <AvatarScene />
         </motion.div>
+
       </div>
     </section>
   );

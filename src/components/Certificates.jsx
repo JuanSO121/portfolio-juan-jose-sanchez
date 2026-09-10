@@ -1,290 +1,239 @@
-import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
-import { useRef, useState } from 'react';
-import { FaCertificate, FaExternalLinkAlt, FaTrophy, FaTimes, FaGraduationCap, FaGlobe, FaShieldAlt, FaChartBar, FaComments } from 'react-icons/fa';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import {
+  FaChartBar,
+  FaComments,
+  FaExternalLinkAlt,
+  FaGlobe,
+  FaGraduationCap,
+  FaShieldAlt,
+  FaTimes,
+  FaTrophy,
+} from 'react-icons/fa';
+import Section, { Reveal } from './ui/Section';
 
-const Certificates = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
-  const [selectedCert, setSelectedCert] = useState(null);
+const RECONOCIMIENTO = {
+  title: 'Beca por Excelencia Académica',
+  issuer: 'Universidad de San Buenaventura Cali',
+  date: '2024-2',
+  icon: FaTrophy, // Antes era la cadena '🏆' y el JSX hacía <distinction.icon />.
+  image: '/certificates/beca-cert.jpeg', // React intentaba montar un componente inexistente.
+  link: null,
+};
 
-  const certificates = [
-    {
-      title: 'Full Stack Empresarial con Spring Boot y Angular',
-      issuer: 'Dev Senior',
-      date: '2025',
-      icon: FaGraduationCap,
-      link: 'https://profiles.badgeclaimed.com/user-9457/badges/urn:uuid:3b5748dc-8164-4137-863d-62f41ef5974b.html',
-      image: '/certificates/fullstack-cert.jpg',
-      featured: true,
-    },
-    {
-      title: 'EF SET English Certificate',
-      issuer: 'EF SET',
-      date: '2025',
-      level: 'B1 Intermediate',
-      icon: FaGlobe,
-      link: 'https://cert.efset.org/en/CQ1ejY',
-      image: '/certificates/english-cert.jpg',
-    },
-    {
-      title: 'Fortinet Certified Fundamentals in Cybersecurity',
-      issuer: 'Fortinet Training Institute',
-      date: '2025',
-      icon: FaShieldAlt,
-      link: '#',
-      image: '/certificates/fortinet-cert.jpg',
-    },
-    {
-      title: 'Business Intelligence + Power BI',
-      issuer: 'BDG Academy',
-      date: '2024',
-      icon: FaChartBar,
-      link: 'https://certificados.bdginstitute.edu.co/',
-      image: '/certificates/powerbi-cert.jpg',
-    },
-    {
-      title: 'Mentoría: Comunicación Consciente',
-      issuer: 'Técnica SLP',
-      date: '2023',
-      icon: FaComments,
-      link: 'https://formessis.com/',
-      image: '/certificates/slp-cert.jpg',
-    },
-  ];
+const CERTIFICADOS = [
+  {
+    title: 'Full Stack Empresarial con Spring Boot y Angular',
+    issuer: 'Dev Senior',
+    date: '2025',
+    icon: FaGraduationCap,
+    link: 'https://profiles.badgeclaimed.com/user-9457/badges/urn:uuid:3b5748dc-8164-4137-863d-62f41ef5974b.html',
+    image: '/certificates/fullstack-cert.jpg',
+  },
+  {
+    title: 'EF SET English Certificate',
+    issuer: 'EF SET',
+    date: '2025',
+    level: 'Nivel B2',
+    icon: FaGlobe,
+    link: 'https://cert.efset.org/en/CQ1ejY',
+    image: '/certificates/english-cert.jpg',
+  },
+  {
+    title: 'Business Intelligence y Power BI',
+    issuer: 'BDG Academy',
+    date: '2024',
+    icon: FaChartBar,
+    link: 'https://certificados.bdginstitute.edu.co/',
+    image: '/certificates/powerbi-cert.jpg',
+  },
+  {
+    title: 'Fundamentos de Ciberseguridad',
+    issuer: 'Fortinet Training Institute',
+    date: '2025',
+    icon: FaShieldAlt,
+    link: null, // Sin enlace real: antes mostraba "Verificar en línea" apuntando a "#".
+    image: '/certificates/fortinet-cert.jpg',
+  },
+  {
+    title: 'Comunicación consciente',
+    issuer: 'Técnica SLP',
+    date: '2023',
+    icon: FaComments,
+    link: 'https://formessis.com/',
+    image: '/certificates/slp-cert.jpg',
+  },
+];
 
-  const distinctions = [
-    {
-      title: 'Beca por Excelencia Académica',
-      issuer: 'Universidad San Buenaventura Cali',
-      date: '2024-2',
-      icon: '🏆',
-      image: '/certificates/beca-cert.jpeg',
-    },
-  ];
+const FALLBACK =
+  'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="600"%3E%3Crect fill="%23e9e9ef" width="800" height="600"/%3E%3Ctext x="50%25" y="50%25" font-family="system-ui" font-size="22" fill="%237a7a8a" text-anchor="middle" dominant-baseline="middle"%3EImagen no disponible%3C/text%3E%3C/svg%3E';
+
+/* ── Modal ───────────────────────────────────────────────────────── */
+const CertModal = ({ cert, onClose }) => {
+  const closeRef = useRef(null);
+
+  useEffect(() => {
+    const onKey = (e) => e.key === 'Escape' && onClose();
+    document.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    closeRef.current?.focus();
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [onClose]);
 
   return (
-    <section id="certificates" className="py-20 px-4">
-      <div className="max-w-7xl mx-auto">
-        <motion.div
-          ref={ref}
-          initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-        >
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-gray-800">
-            Certificaciones <span className="bg-gradient-to-r from-purple-400 to-green-400 bg-clip-text text-transparent">& Logros</span>
-          </h2>
-          
-          <div className="w-20 h-1 bg-gradient-to-r from-purple-400 to-green-400 mx-auto mb-12 rounded-full"></div>
-
-          {/* Distinciones Destacadas */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.2 }}
-            className="mb-12"
-          >
-            <h3 className="text-2xl font-bold text-center mb-6 text-gray-800 flex items-center justify-center gap-2">
-              <FaTrophy className="text-yellow-500" /> Distinciones
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <motion.div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cert-title"
+        initial={{ opacity: 0, scale: 0.97 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.97 }}
+        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+        onClick={(e) => e.stopPropagation()}
+        className="flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-card border border-line bg-surface"
+      >
+        <div className="flex items-start justify-between gap-4 border-b border-line p-5 sm:p-6">
+          <div>
+            <h3 id="cert-title" className="font-display text-lg font-bold text-ink sm:text-xl">
+              {cert.title}
             </h3>
-            <div className="max-w-2xl mx-auto">
-              {distinctions.map((distinction, index) => (
-                <motion.div
-                  key={index}
-                  whileHover={{ scale: 1.02 }}
-                  className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200 shadow-lg cursor-pointer group relative overflow-hidden"
-                  onClick={() => setSelectedCert(distinction)}
-                >
-                  {/* Preview del certificado en hover */}
-                  <div className="absolute inset-0 bg-black/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
-                    <div className="text-white text-center">
-                      <FaCertificate className="text-6xl mx-auto mb-2" />
-                      <p className="font-semibold">Click para ver certificado</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-100 to-orange-100 flex items-center justify-center">
-                      <distinction.icon className={`text-3xl ${distinction.iconColor}`} />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="text-xl font-bold text-gray-800 mb-1">
-                        {distinction.title}
-                      </h4>
-                      <p className="text-gray-600 text-sm">{distinction.issuer}</p>
-                      <p className="text-purple-600 font-semibold text-sm">{distinction.date}</p>
-                    </div>
-                    <FaTrophy className="text-4xl text-yellow-500" />
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Certificaciones */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {certificates.map((cert, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ delay: index * 0.1 + 0.3 }}
-                whileHover={{ y: -5 }}
-                className={`bg-white/80 backdrop-blur-sm rounded-2xl p-6 hover:shadow-2xl transition-all cursor-pointer group relative overflow-hidden ${
-                  cert.featured ? 'border-2 border-purple-400' : 'shadow-lg'
-                }`}
-                onClick={() => setSelectedCert(cert)}
-              >
-                {/* Preview del certificado en hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-600/90 to-green-600/90 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
-                  <div className="text-white text-center">
-                    <FaCertificate className="text-6xl mx-auto mb-2" />
-                    <p className="font-semibold">Click para ver certificado</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start justify-between mb-4">
-                  <div className="text-purple-500 text-xl">
-                    <cert.icon />
-                  </div>
-
-                  <FaCertificate className="text-purple-400 text-2xl opacity-50 group-hover:opacity-100 transition-opacity" />
-                </div>
-
-                <h3 className="text-lg font-bold mb-2 text-gray-800 group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-green-400 group-hover:bg-clip-text group-hover:text-transparent transition-all">
-                  {cert.title}
-                </h3>
-
-                <p className="text-gray-600 mb-1 text-sm">{cert.issuer}</p>
-                {cert.level && (
-                  <p className="text-green-600 font-semibold text-sm mb-1">{cert.level}</p>
-                )}
-                <p className="text-xs text-gray-500 mb-4">{cert.date}</p>
-
-                <motion.a
-                  href={cert.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="inline-flex items-center gap-2 text-purple-600 font-semibold hover:text-green-600 transition-colors text-sm"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  Verificar en línea <FaExternalLinkAlt size={12} />
-                </motion.a>
-              </motion.div>
-            ))}
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : {}}
-            transition={{ delay: 0.8 }}
-            className="mt-12 text-center"
-          >
-            <p className="text-gray-600 text-lg mb-4">
-              Comprometido con el aprendizaje continuo y la excelencia
+            <p className="mt-1 text-sm text-muted">
+              {cert.issuer} · {cert.date}
+              {cert.level ? ` · ${cert.level}` : ''}
             </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <div className="px-6 py-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg">
-                <span className="font-bold text-purple-600 text-2xl">{certificates.length}</span>
-                <span className="text-gray-600 ml-2">Certificaciones</span>
-              </div>
-              <div className="px-6 py-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg flex items-center gap-2">
-                <FaTrophy className="text-yellow-500 text-xl" />
-                <span className="text-gray-600">Beca Excelencia</span>
-              </div>
-              <div className="px-6 py-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg flex items-center gap-2">
-                <FaGlobe className="text-blue-500 text-xl" />
-                <span className="font-bold text-green-600">B1</span>
-                <span className="text-gray-600">Inglés</span>
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-      </div>
-
-      {/* Modal para visualizar certificado */}
-      {selectedCert && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
-          onClick={() => setSelectedCert(null)}
-        >
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            className="relative max-w-4xl w-full bg-white rounded-2xl shadow-2xl my-8 max-h-[90vh] flex flex-col"
-            onClick={(e) => e.stopPropagation()}
+          </div>
+          <button
+            ref={closeRef}
+            type="button"
+            onClick={onClose}
+            aria-label="Cerrar"
+            className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-line text-muted transition-colors hover:text-ink"
           >
-            {/* Header del modal - Fijo */}
-            <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-200 flex-shrink-0">
-              <div className="flex-1 pr-4">
-                <h3 className="text-lg md:text-2xl font-bold text-gray-800 mb-1">
-                  {selectedCert.title}
-                </h3>
-                <p className="text-gray-600 text-xs md:text-sm">{selectedCert.issuer}</p>
-              </div>
+            <FaTimes />
+          </button>
+        </div>
+
+        <div className="flex flex-1 items-center justify-center overflow-y-auto bg-stage p-4 sm:p-6">
+          <img
+            src={cert.image}
+            alt={`Certificado: ${cert.title}`}
+            className="max-h-[58vh] w-auto max-w-full rounded-lg object-contain"
+            onError={(e) => {
+              e.currentTarget.src = FALLBACK;
+            }}
+          />
+        </div>
+
+        {cert.link && (
+          <div className="border-t border-line p-5 sm:p-6">
+            <a href={cert.link} target="_blank" rel="noopener noreferrer" className="btn-primary">
+              <FaExternalLinkAlt size={12} /> Verificar con la entidad
+            </a>
+          </div>
+        )}
+      </motion.div>
+    </motion.div>
+  );
+};
+
+/* ── Sección ─────────────────────────────────────────────────────── */
+const Certificates = () => {
+  const [selected, setSelected] = useState(null);
+  const reduce = useReducedMotion();
+
+  return (
+    <Section
+      id="certificates"
+      title="Certificaciones"
+      lead="Cada tarjeta abre el documento. Las que se pueden verificar enlazan a la entidad que las emitió."
+    >
+      {/* El reconocimiento se destaca por posición y tamaño, no por un
+          degradado amarillo que rompía la paleta del sitio. */}
+      <Reveal>
+        <button
+          type="button"
+          onClick={() => setSelected(RECONOCIMIENTO)}
+          className="card group mb-4 flex w-full items-center gap-5 p-6 text-left transition-colors hover:border-multimedia/50"
+        >
+          <span className="flex h-12 w-12 flex-none items-center justify-center rounded-full bg-multimedia/10 text-multimedia">
+            <RECONOCIMIENTO.icon size={20} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-display text-lg font-bold text-ink">
+              {RECONOCIMIENTO.title}
+            </span>
+            <span className="mt-1 block text-sm text-muted">
+              {RECONOCIMIENTO.issuer} · {RECONOCIMIENTO.date}
+            </span>
+          </span>
+          <span className="hidden text-sm text-faint transition-colors group-hover:text-multimedia sm:block">
+            Ver documento
+          </span>
+        </button>
+      </Reveal>
+
+      <ul className="grid gap-4 sm:grid-cols-2">
+        {CERTIFICADOS.map((cert, i) => (
+          <li key={cert.title}>
+            <Reveal delay={reduce ? 0 : i * 0.04}>
+              {/* Toda la tarjeta es un botón. Antes había un <a> dentro
+                  de un div clicable, y encima una capa de hover con
+                  z-10 que tapaba ese enlace justo al pasar el cursor:
+                  era imposible pulsarlo. */}
               <button
-                onClick={() => setSelectedCert(null)}
-                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors flex-shrink-0"
+                type="button"
+                onClick={() => setSelected(cert)}
+                className="card group flex h-full w-full flex-col p-6 text-left transition-colors hover:border-multimedia/50"
               >
-                <FaTimes className="text-xl text-gray-600" />
+                <span className="mb-5 flex h-11 w-11 items-center justify-center rounded-full bg-multimedia/10 text-multimedia">
+                  <cert.icon size={18} />
+                </span>
+
+                <span className="font-display text-base font-bold leading-snug text-ink">
+                  {cert.title}
+                </span>
+
+                <span className="mt-2 text-sm text-muted">{cert.issuer}</span>
+
+                <span className="mt-auto flex items-center gap-2 pt-5 text-sm text-faint">
+                  {cert.date}
+                  {cert.level && (
+                    <>
+                      <span aria-hidden="true">·</span>
+                      <span className="text-sistemas">{cert.level}</span>
+                    </>
+                  )}
+                  {cert.link && (
+                    <FaExternalLinkAlt
+                      size={10}
+                      aria-hidden="true"
+                      className="ml-auto transition-colors group-hover:text-multimedia"
+                    />
+                  )}
+                </span>
               </button>
-            </div>
+            </Reveal>
+          </li>
+        ))}
+      </ul>
 
-            {/* Imagen del certificado - Ajustada al tamaño del modal */}
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 flex items-center justify-center">
-              <div className="relative rounded-lg overflow-hidden shadow-lg w-full">
-                <img
-                  src={selectedCert.image}
-                  alt={`Certificado de ${selectedCert.title}`}
-                  className="w-full h-auto max-h-[55vh] object-contain"
-                  onError={(e) => {
-                    e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="600"%3E%3Crect fill="%23f3f4f6" width="800" height="600"/%3E%3Ctext x="50%25" y="50%25" font-family="Arial" font-size="24" fill="%239ca3af" text-anchor="middle" dominant-baseline="middle"%3ECertificado no disponible%3C/text%3E%3C/svg%3E';
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Footer con acciones - Fijo */}
-            <div className="flex items-center justify-between p-4 md:p-6 border-t border-gray-200 gap-4 flex-wrap flex-shrink-0">
-              <div className="text-sm text-gray-600">
-                <p className="font-semibold">{selectedCert.date}</p>
-                {selectedCert.level && <p className="text-xs md:text-sm">{selectedCert.level}</p>}
-              </div>
-              
-              <div className="flex gap-2 md:gap-3 flex-wrap">
-                {selectedCert.link && selectedCert.link !== '#' && (
-                  <motion.a
-                    href={selectedCert.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-purple-600 to-green-600 text-white rounded-full font-semibold shadow-lg text-sm"
-                  >
-                    <FaExternalLinkAlt className="text-xs" /> <span className="hidden sm:inline">Verificar en línea</span><span className="sm:hidden">Verificar</span>
-                  </motion.a>
-                )}
-                <motion.button
-                  onClick={() => setSelectedCert(null)}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-4 md:px-6 py-2 md:py-3 bg-white border-2 border-gray-300 rounded-full font-semibold text-gray-700 hover:text-purple-600 transition-colors text-sm"
-                >
-                  Cerrar
-                </motion.button>
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </section>
+      {/* AnimatePresence faltaba: las animaciones de salida del modal
+          nunca llegaban a ejecutarse. */}
+      <AnimatePresence>
+        {selected && <CertModal cert={selected} onClose={() => setSelected(null)} />}
+      </AnimatePresence>
+    </Section>
   );
 };
 

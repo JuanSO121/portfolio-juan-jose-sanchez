@@ -1,157 +1,89 @@
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
-import { FaGithub, FaLinkedin, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaEnvelope, FaGithub, FaLinkedin, FaWhatsapp } from 'react-icons/fa';
+import { Reveal } from './ui/Section';
 
-const Contact = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
+const CONTACTO = [
+  {
+    icon: FaEnvelope,
+    label: 'Correo',
+    value: 'jj.sanchezocampo@gmail.com',
+    href: 'mailto:jj.sanchezocampo@gmail.com',
+  },
+  {
+    icon: FaWhatsapp,
+    label: 'WhatsApp',
+    value: '+57 316 447 5039',
+    href: 'https://wa.me/573164475039',
+  },
+  {
+    icon: FaLinkedin,
+    label: 'LinkedIn',
+    value: 'linkedin.com/in/jjsanchezo',
+    href: 'https://www.linkedin.com/in/jjsanchezo',
+  },
+  {
+    icon: FaGithub,
+    label: 'GitHub',
+    value: 'github.com/JuanSO121',
+    href: 'https://github.com/JuanSO121',
+  },
+];
 
-  const contactInfo = [
-    {
-      icon: FaEnvelope,
-      label: 'Email',
-      value: 'juanjosesanchezocampo2@gmail.com',
-      link: 'mailto:juanjosesanchezocampo2@gmail.com',
-      color: 'from-red-200 to-red-300',
-    },
-    {
-      icon: FaLinkedin,
-      label: 'LinkedIn',
-      value: 'Juan José Sánchez Ocampo',
-      link: 'https://www.linkedin.com/in/juansanchez01',
-      color: 'from-blue-200 to-blue-300',
-    },
-    {
-      icon: FaGithub,
-      label: 'GitHub',
-      value: '@juanjosesanchezocampo',
-      link: 'https://github.com/JuanSO121',
-      color: 'from-gray-200 to-gray-300',
-    },
-    {
-      icon: FaMapMarkerAlt,
-      label: 'Ubicación',
-      value: 'Cali, Colombia',
-      link: null,
-      color: 'from-green-200 to-green-300',
-    },
-  ];
+const Contact = () => (
+  <footer
+    id="contact"
+    className="flex min-h-[calc(100svh-4rem)] items-center border-t border-line bg-surface/50"
+  >
+    <div className="mx-auto w-full max-w-6xl px-5 py-[clamp(4rem,10vh,7rem)] sm:px-8">
+      <Reveal>
+        <h2 className="max-w-3xl text-display-md font-extrabold text-ink">
+          Busco mi primer trabajo como desarrollador.
+        </h2>
+        <p className="mt-5 max-w-prose text-lg leading-relaxed text-muted">
+          Estoy disponible desde ya. Si tienes una vacante, o solo quieres preguntarme cómo hice
+          algo de lo de arriba, escríbeme. Respondo el mismo día.
+        </p>
+      </Reveal>
 
-  return (
-    <section id="contact" className="py-20 px-4">
-      <div className="max-w-6xl mx-auto">
-        <motion.div
-          ref={ref}
-          initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-        >
-          {/* TÍTULO */}
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-primary">
-            Hablemos <span className="gradient-text">!</span>
-          </h2>
+      <Reveal delay={0.06}>
+        <div className="mt-10 flex flex-wrap gap-3">
+          <a href="mailto:jj.sanchezocampo@gmail.com" className="btn-primary">
+            <FaEnvelope size={14} /> Escribirme un correo
+          </a>
+          <a href="/Juan_Jose_Sanchez_CV.pdf" download className="btn-ghost">
+            Descargar hoja de vida
+          </a>
+        </div>
+      </Reveal>
 
-          <div className="w-20 h-1 bg-gradient-to-r from-multimedia-dark to-sistemas-dark mx-auto mb-12 rounded-full"></div>
-
-          {/* CONTENEDOR */}
-          <div className="glass rounded-3xl p-8 md:p-12">
-            <motion.p
-              className="text-center text-base sm:text-lg text-secondary mb-12 max-w-2xl mx-auto"
-              initial={{ opacity: 0 }}
-              animate={isInView ? { opacity: 1 } : {}}
-              transition={{ delay: 0.2 }}
-            >
-              Estoy disponible para colaborar en proyectos interesantes, prácticas profesionales
-              o simplemente para conversar sobre tecnología. ¡No dudes en contactarme!
-            </motion.p>
-
-            {/* TARJETAS */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-              {contactInfo.map((item, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-                  animate={isInView ? { opacity: 1, x: 0 } : {}}
-                  transition={{ delay: 0.3 + index * 0.1 }}
-                  whileHover={{ scale: 1.02 }}
-                  className={`p-6 rounded-2xl bg-gradient-to-br ${item.color}`}
-                >
-                  {item.link ? (
-                    <a
-                      href={item.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex flex-col sm:flex-row sm:items-center gap-4 text-center sm:text-left"
-                    >
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white rounded-full flex items-center justify-center shadow-md mx-auto sm:mx-0">
-                        <item.icon className="text-2xl text-gray-700" />
-                      </div>
-
-                      <div className="w-full">
-                        <div className="text-sm text-gray-600 font-medium">
-                          {item.label}
-                        </div>
-                        <div className="text-base sm:text-lg font-semibold text-gray-800 break-all">
-                          {item.value}
-                        </div>
-                      </div>
-                    </a>
-                  ) : (
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-center sm:text-left">
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white rounded-full flex items-center justify-center shadow-md mx-auto sm:mx-0">
-                        <item.icon className="text-2xl text-gray-700" />
-                      </div>
-
-                      <div className="w-full">
-                        <div className="text-sm text-gray-600 font-medium">
-                          {item.label}
-                        </div>
-                        <div className="text-base sm:text-lg font-semibold text-gray-800 break-words">
-                          {item.value}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-
-            {/* BOTÓN */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.8 }}
-              className="text-center"
-            >
-              <motion.a
-                href="mailto:juanjosesanchezocampo2@gmail.com"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-multimedia-dark to-sistemas-dark text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all text-base sm:text-lg"
+      <Reveal delay={0.1}>
+        <ul className="mt-16 grid gap-x-10 border-t border-line sm:grid-cols-2">
+          {CONTACTO.map(({ icon: Icon, label, value, href }) => (
+            <li key={label} className="border-b border-line">
+              <a
+                href={href}
+                target={href.startsWith('mailto') ? undefined : '_blank'}
+                rel="noopener noreferrer"
+                className="group flex items-center gap-4 py-4"
               >
-                <FaEnvelope /> Envíame un mensaje
-              </motion.a>
-            </motion.div>
-          </div>
+                <Icon aria-hidden="true" className="flex-none text-lg text-multimedia" />
+                <span className="w-20 flex-none text-sm text-faint">{label}</span>
+                <span className="min-w-0 break-all font-medium text-ink transition-colors group-hover:text-multimedia">
+                  {value}
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </Reveal>
 
-          {/* FOOTER */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : {}}
-            transition={{ delay: 1 }}
-            className="mt-12 text-center text-secondary"
-          >
-            <p className="mb-4">
-              © 2025 Juan José Sánchez Ocampo. Todos los derechos reservados.
-            </p>
-            <p className="text-sm">
-              Hecho con ❤️ usando React + Vite + Tailwind CSS
-            </p>
-          </motion.div>
-        </motion.div>
-      </div>
-    </section>
-  );
-};
+      <Reveal delay={0.14}>
+        <p className="mt-12 text-sm text-faint">
+          Cali, Colombia · © {new Date().getFullYear()} Juan José Sánchez Ocampo · React, Vite y
+          Tailwind CSS
+        </p>
+      </Reveal>
+    </div>
+  </footer>
+);
 
 export default Contact;

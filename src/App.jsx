@@ -1,20 +1,28 @@
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import About from './components/About';
-import Skills from './components/Skills';
 import Projects from './components/Projects';
-import Certificates from './components/Certificates';
+import Experience from './components/Experience';
+import Skills from './components/Skills';
+import About from './components/About';
 import Contact from './components/Contact';
 
 function App() {
   return (
     <div className="min-h-screen">
+      <a href="#main" className="skip-link">
+        Saltar al contenido
+      </a>
+
       <Navbar />
-      <Hero />
-      <About />
-      <Skills />
-      <Projects />
-      <Certificates />
+
+      <main id="main">
+        <Hero />
+        <Projects />
+        <Experience />
+        <Skills />
+        <About />
+      </main>
+
       <Contact />
     </div>
   );
