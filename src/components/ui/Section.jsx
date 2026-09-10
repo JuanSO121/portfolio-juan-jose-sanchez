@@ -42,8 +42,13 @@ const Section = ({ id, title, lead, band = false, children }) => {
         band ? 'border-y border-line bg-surface/50' : ''
       }`}
     >
-      <div className="mx-auto w-full max-w-6xl px-5 py-[clamp(3rem,8vh,5rem)] sm:px-8">
-        <header className="mb-8">
+      {/* Relleno asimétrico a propósito: arriba ya están los 64px del
+          navbar, así que la sección solo necesita un margen mínimo. El
+          aire de las secciones cortas lo da min-h con el centrado, no
+          el relleno; usarlo para eso desperdiciaba altura justo en las
+          secciones que no caben. */}
+      <div className="mx-auto w-full max-w-6xl px-5 pb-[clamp(2.5rem,6vh,4rem)] pt-[clamp(1.25rem,3vh,2.25rem)] sm:px-8">
+        <header className="mb-6">
           <h2 className="font-display text-2xl font-bold tracking-tight text-ink">{title}</h2>
           <div className="mt-3 h-px w-24 overflow-hidden bg-line">
             <motion.div
@@ -53,7 +58,7 @@ const Section = ({ id, title, lead, band = false, children }) => {
           </div>
         </header>
 
-        {lead && <p className="mb-10 max-w-prose text-lg leading-relaxed text-muted">{lead}</p>}
+        {lead && <p className="mb-8 max-w-prose text-lg leading-relaxed text-muted">{lead}</p>}
 
         {children}
       </div>

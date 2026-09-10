@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { useState } from 'react';
-import { FaExternalLinkAlt } from 'react-icons/fa';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { FaArrowUp, FaExternalLinkAlt } from 'react-icons/fa';
 import ProjectSystem from './ui/ProjectSystem';
 import Section from './ui/Section';
 
@@ -8,23 +8,28 @@ const allImages = import.meta.glob('/public/proyects/**/*.{png,jpg,jpeg,webp,svg
   eager: true,
 });
 
-// Cada proyecto puede tener public/proyects/<carpeta>/logo.png. Si no
-// existe, el nodo cae en la inicial del nombre.
-const LOGOS = Object.fromEntries(
+// Convención de archivos, por carpeta de proyecto:
+//   public/proyects/<carpeta>/logo.svg    → burbuja del sistema orbital
+//   public/proyects/<carpeta>/cover.png   → portada del panel de detalle
+// Si no hay cover, se usa la primera imagen que no sea el logo, para que
+// algo se vea mientras la subes.
+const byFolder = (test) =>
   Object.entries(allImages)
-    .filter(([path]) => /\/logo\.[a-z]+$/i.test(path))
-    .map(([path, mod]) => [path.split('/proyects/')[1].split('/')[0], mod.default]),
-);
+    .filter(([path]) => test(path))
+    .sort(([a], [b]) => a.localeCompare(b))
+    .reduce((acc, [path, mod]) => {
+      const folder = path.split('/proyects/')[1].split('/')[0];
+      if (!acc[folder]) acc[folder] = mod.default;
+      return acc;
+    }, {});
 
-// Portada: la primera imagen de la carpeta que no sea el logo.
-const COVERS = Object.entries(allImages)
-  .filter(([path]) => !/\/logo\.[a-z]+$/i.test(path))
-  .sort(([a], [b]) => a.localeCompare(b))
-  .reduce((acc, [path, mod]) => {
-    const folder = path.split('/proyects/')[1].split('/')[0];
-    if (!acc[folder]) acc[folder] = mod.default;
-    return acc;
-  }, {});
+const isLogo = (path) => /\/logo\.[a-z]+$/i.test(path);
+const isCover = (path) => /\/cover\.[a-z]+$/i.test(path);
+
+const LOGOS = byFolder(isLogo);
+const EXPLICIT_COVERS = byFolder(isCover);
+const FALLBACK_COVERS = byFolder((path) => !isLogo(path) && !isCover(path));
+const COVERS = { ...FALLBACK_COVERS, ...EXPLICIT_COVERS };
 
 const PROJECTS = [
   {
@@ -67,15 +72,15 @@ const PROJECTS = [
     year: '2026',
     folder: 'compas',
     problem:
-      'El GPS no funciona bajo techo. Una persona con discapacidad visual que entra a un edificio público se queda sin ninguna guía.',
+      'El GPS no funciona bajo techo. Una persona ciega que entra a un edificio público se queda sin guía.',
     work: [
-      'Backend en Python y FastAPI sobre MongoDB para rutas y puntos de interés en interiores.',
-      'Detección de obstáculos con visión por computador en Flutter y Unity, con recálculo de ruta en tiempo real.',
+      'Backend en Python y FastAPI, y navegación en realidad aumentada con Unity dentro de la app Flutter.',
+      'Comandos de voz clasificados por un modelo TFLite en el dispositivo, con respaldo remoto: funciona sin internet.',
     ],
-    stack: ['Python', 'FastAPI', 'MongoDB', 'Flutter', 'Unity'],
+    stack: ['Flutter', 'Unity AR', 'Python', 'FastAPI', 'TensorFlow Lite'],
     live: 'https://compas-lovat.vercel.app/',
     domain: 'compas-lovat.vercel.app',
-    repo: null,
+    repo: 'https://github.com/JuanSO121/compas-client-mobile',
     accent: '251 146 60',
   },
   {
@@ -154,8 +159,42 @@ const Cover = ({ p }) => {
 
 const Projects = () => {
   const [active, setActive] = useState(0);
+  const [showBack, setShowBack] = useState(false);
   const reduce = useReducedMotion();
+  const systemRef = useRef(null);
+  const detailRef = useRef(null);
   const p = PROJECTS[active];
+
+  // En móvil el sistema está arriba y el detalle 600px más abajo: al
+  // tocar una burbuja el cambio ocurre fuera de pantalla y parece que
+  // no pasó nada. Llevamos la vista al detalle.
+  const select = useCallback(
+    (i) => {
+      setActive(i);
+      if (window.innerWidth >= 1024) return;
+      requestAnimationFrame(() => {
+        detailRef.current?.scrollIntoView({
+          behavior: reduce ? 'auto' : 'smooth',
+          block: 'start',
+        });
+      });
+    },
+    [reduce],
+  );
+
+  // Vuelta al sistema: aparece cuando ya lo dejaste atrás pero sigues
+  // dentro de la sección.
+  useEffect(() => {
+    const onScroll = () => {
+      const sys = systemRef.current?.getBoundingClientRect();
+      const det = detailRef.current?.getBoundingClientRect();
+      if (!sys || !det) return;
+      setShowBack(sys.bottom < 80 && det.bottom > 200);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const fade = {
     initial: reduce ? false : { opacity: 0, y: 10 },
@@ -174,16 +213,16 @@ const Projects = () => {
         {/* La pista del centro lleva ancho explícito: el sistema tiene
             todo su contenido en absoluto, así que en una pista `auto`
             el navegador le calcula ancho cero y desaparece. */}
-        <div className="order-1 lg:order-2">
+        <div ref={systemRef} className="order-1 scroll-mt-20 lg:order-2">
           <ProjectSystem
             projects={PROJECTS}
             active={active}
-            onSelect={setActive}
+            onSelect={select}
             logos={LOGOS}
           />
         </div>
 
-        <div className="relative order-2 lg:order-1 lg:pr-8">
+        <div ref={detailRef} className="relative order-2 scroll-mt-20 lg:order-1 lg:pr-8">
           <Tick accent={p.accent} side="left" />
           <AnimatePresence mode="wait">
             <motion.div key={active} {...fade} className="lg:text-right">
@@ -248,6 +287,29 @@ const Projects = () => {
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Solo móvil: el escritorio ve sistema y detalle a la vez. */}
+      <AnimatePresence>
+        {showBack && (
+          <motion.button
+            type="button"
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.85 }}
+            transition={{ duration: 0.2 }}
+            onClick={() =>
+              systemRef.current?.scrollIntoView({
+                behavior: reduce ? 'auto' : 'smooth',
+                block: 'start',
+              })
+            }
+            aria-label="Volver a los proyectos"
+            className="fixed bottom-6 right-5 z-40 flex h-12 w-12 items-center justify-center rounded-full border border-line bg-surface/70 text-ink shadow-lg backdrop-blur-md lg:hidden"
+          >
+            <FaArrowUp size={14} />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </Section>
   );
 };

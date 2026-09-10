@@ -33,7 +33,7 @@ const Contact = () => (
     id="contact"
     className="flex min-h-[calc(100svh-4rem)] items-center border-t border-line bg-surface/50"
   >
-    <div className="mx-auto w-full max-w-6xl px-5 py-[clamp(4rem,10vh,7rem)] sm:px-8">
+    <div className="mx-auto w-full max-w-6xl px-5 pb-[clamp(2.5rem,6vh,4rem)] pt-[clamp(1.25rem,3vh,2.25rem)] sm:px-8">
       <Reveal>
         <h2 className="max-w-3xl text-display-md font-extrabold text-ink">
           Busco mi primer trabajo como desarrollador.
@@ -78,8 +78,8 @@ const Contact = () => (
 
       <Reveal delay={0.14}>
         <p className="mt-12 text-sm text-faint">
-          Cali, Colombia · © {new Date().getFullYear()} Juan José Sánchez Ocampo · React, Vite y
-          Tailwind CSS
+          Cali, Colombia · © {new Date().getFullYear()} Juan José Sánchez Ocampo · Construido con
+          React, Vite y Tailwind CSS, desplegado en Vercel
         </p>
       </Reveal>
     </div>

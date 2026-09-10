@@ -5,6 +5,7 @@ import HeroBackdrop from './ui/HeroBackdrop';
 import RevealText from './ui/RevealText';
 
 const DATOS = ['Cali, Colombia', 'Disponible inmediatamente', 'Presencial, híbrido o remoto'];
+const STACK = ['React', 'TypeScript', 'Java', 'Python'];
 
 const Hero = () => {
   const reduce = useReducedMotion();
@@ -66,13 +67,23 @@ const Hero = () => {
             className="mt-5 max-w-prose text-xl leading-relaxed text-muted sm:text-2xl"
           >
             Desarrollador full stack con doble formación en Ingeniería de Sistemas e Ingeniería
-            Multimedia. Construyo aplicaciones web y móviles con React, TypeScript, Java y Python,
-            centradas en la experiencia de quien las usa.
+            Multimedia. Construyo aplicaciones web y móviles centradas en la experiencia de quien
+            las usa.
           </motion.p>
 
-          <motion.p variants={item} className="mt-4 max-w-prose text-lg text-muted">
-            Busco mi primer puesto a tiempo completo en un equipo de producto.
-          </motion.p>
+          {/* El stack sale de la frase y baja a fila propia: la frase se
+              lee mejor y las palabras clave siguen arriba del pliegue,
+              que es lo que cruza un reclutador contra la vacante. */}
+          <motion.ul variants={item} className="mt-6 flex flex-wrap gap-2">
+            {STACK.map((t) => (
+              <li
+                key={t}
+                className="rounded-full border border-line px-3 py-1 text-sm text-muted"
+              >
+                {t}
+              </li>
+            ))}
+          </motion.ul>
 
           <motion.ul
             variants={item}

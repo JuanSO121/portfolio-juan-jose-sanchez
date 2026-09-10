@@ -5,6 +5,7 @@ import Experience from './components/Experience';
 import Skills from './components/Skills';
 import About from './components/About';
 import Contact from './components/Contact';
+import SideRail from './components/ui/SideRail';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       </a>
 
       <Navbar />
+      <SideRail />
 
       <main id="main">
         <Hero />
